@@ -214,13 +214,13 @@ class clockanalog{
         y = (95 * cos(minn * (pi/180))) + 120;
         ix =(25 * sin(temp * (pi/180))) + 120;
         iy = (25 * cos(temp * (pi/180))) + 120;
-        this->display->drawLine((int16_t) iy ,(int16_t)ix ,(int16_t) y ,(int16_t) x ,color ); 
+        this->display->drawLine( iy ,ix , y , x ,color ); 
         temp = minn + 3;
         if (temp >= 360)
           temp = temp - 360;
         ix =(25 * sin(temp * (pi/180))) + 120;
         iy = (25 * cos(temp * (pi/180))) + 120; 
-        this->display->drawLine((int16_t) iy ,(int16_t)ix ,(int16_t) y ,(int16_t) x ,color );
+        this->display->drawLine( iy ,ix , y , x ,color );
       }// end setMin
 
     void drawbackground(void){
@@ -241,7 +241,6 @@ class clockanalog{
             ly = (105 * cos(i * (pi/180)))+ 120;
             ox = (120 * sin(i * (pi/180)))+ 120;
             oy = (120 * cos(i * (pi/180)))+ 120;
-            //cout << "grader = "<< i << " lx " << lx << " ly " << ly << " ox " << ox << " oy " << oy << " sin i " << sin(i* (pi/180)) << " cos " << cos(i * (pi / 180)) << endl;
             this->display->drawLine((int16_t) ly ,(int16_t)lx ,(int16_t) oy ,(int16_t) ox ,color_marks ); 
           }
       }// end drawbackground 
@@ -260,6 +259,8 @@ class clockanalog{
        *hour += offsethour;
        if(*hour > 23)
           *hour -= 24;
+         if(*hour < 0)
+            *hour = 24 - *hour;
       }//end
          
     public:
@@ -345,6 +346,7 @@ class clockanalog{
 #define utcBangkoktxt "   Bangkok"
 #define utcNewDelhi 5
 #define utcNewDelhiMin 30
+#define utcNewDelhitxt "  New Delhi"
 
 clockanalog *clk1 = new clockanalog(tft1, utcNewYork , false);
 clockanalog *clk2 = new clockanalog(tft2, utcCopenhagen , false );
@@ -365,6 +367,9 @@ void setup1(void) {
   clk1->settext(utcNewYorktxt);
   clk3->settext(utcTokyotxt);
   clk4->settext(utcBangkoktxt);
+  clk4->changeUtcOffset( utcNewDelhi , utcNewDelhiMin );
+  clk4->settext(utcNewDelhitxt);
+  
 }
 
 int last_read_sec = 0;
