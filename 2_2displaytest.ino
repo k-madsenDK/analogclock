@@ -53,7 +53,7 @@ void setup(void) {
   
   int status = -1;
   Serial.println("Hello! 2x2 Display DEMO");
-  status = WiFi.begin("Kirkebakken39", "oz1ldoKim");
+  status = WiFi.begin("ssid", "password");
   if(status != WL_CONNECTED){
     Serial.println("Kunne IKKE connecte netværket, rebooter om 5 sekund...");
     delay(5000);
@@ -329,22 +329,27 @@ class clockanalog{
       if((utcoffset < -23) or (utcoffset > 23) )
           return false;
       this->utcOffset = utcoffset;
+      this->utcoffsetmin = utcoffsetmin; 
       return true;
       }// end
   };
 
 #define utcCopenhagen 1
+#define utcCopenhagentxt "   Esbjerg "
 #define utcNewYork -5
+#define utcNewYorktxt "   New York "
 #define utcTokyo 9
+#define utcTokyotxt "Tokyo"
 #define utcKyiv 2
 #define utcBangkok 7
+#define utcBangkoktxt "   Bangkok"
 #define utcNewDelhi 5
 #define utcNewDelhiMin 30
 
 clockanalog *clk1 = new clockanalog(tft1, utcNewYork , false);
 clockanalog *clk2 = new clockanalog(tft2, utcCopenhagen , false );
 clockanalog *clk3 = new clockanalog(tft3, utcTokyo , false );
-clockanalog *clk4 = new clockanalog(tft4, utcNewDelhi , false ,utcNewDelhiMin);
+clockanalog *clk4 = new clockanalog(tft4, utcBangkok , false );
 
 void setup1(void) {
   
@@ -356,10 +361,10 @@ void setup1(void) {
   while(!core0initcomplete){// wait for core0 to complete
     delay(250);
   }
-  clk2->settext("   Esbjerg ");
-  clk1->settext("   New York ");
-  clk3->settext("Tokyo");
-  clk4->settext("  New Delhi");
+  clk2->settext(utcCopenhagentxt);
+  clk1->settext(utcNewYorktxt);
+  clk3->settext(utcTokyotxt);
+  clk4->settext(utcBangkoktxt);
 }
 
 int last_read_sec = 0;
