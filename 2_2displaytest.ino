@@ -53,7 +53,7 @@ void setup(void) {
   
   int status = -1;
   Serial.println("Hello! 2x2 Display DEMO");
-  status = WiFi.begin("ssid", "password");
+  status = WiFi.begin("Kirkebakken39", "oz1ldoKim");
   if(status != WL_CONNECTED){
     Serial.println("Kunne IKKE connecte netværket, rebooter om 5 sekund...");
     delay(5000);
@@ -135,7 +135,7 @@ class clockanalog{
     
     uint16_t old_sec = 0 , old_min = 0 , old_hour = 0 ;
     int lasthourmin, hourlastangel;
-    int utcOffset = 1; 
+    int utcOffset = 0, utcoffsetmin = 0; 
     
     bool summertime = false , ampmLastRead = false;
 
@@ -246,13 +246,30 @@ class clockanalog{
           }
       }// end drawbackground 
       
+      void calculatelokaltime(int *hour ,int *minuttes , int ofsettmin , int offsethour){
+       
+       if(ofsettmin != 0){
+          *minuttes += ofsettmin;
+          if(*minuttes > 59){
+            ++*hour;
+            if(*hour > 23)
+              *hour -=24;
+            }//end if
+            *minuttes -=60;
+          }//end if
+       *hour += offsethour;
+       if(*hour > 23)
+          *hour -= 24;
+      }//end
+         
     public:
     
-    clockanalog(Adafruit_ST7789 *display ,int utctimeoffset = 0, bool summertime = false, int16_t with = 240 , int16_t height = 240 ){
+    clockanalog(Adafruit_ST7789 *display ,int utctimeoffset = 0, bool summertime = false, int utcoffsetmin= 0, int16_t with = 240 , int16_t height = 240 ){
       this->display = display;
       display->init(with, height);           // Init ST7789 240x240
       drawbackground();
       this->utcOffset = utctimeoffset;
+      this->utcoffsetmin = utcoffsetmin;
       this->summertime = summertime;
       this->setAmPmTxt();
       }
@@ -266,12 +283,10 @@ class clockanalog{
       if(summertime == true)
         hour +=1;
       if(old_sec == old_min)
-          redraw = true;  
-      hour += this->utcOffset;
-      if(hour >= 24)
-          hour -= 24;
-      if(hour < 0)
-        hour = 24 - hour;
+          redraw = true; 
+          
+      calculatelokaltime(&hour , &minuttes ,utcoffsetmin ,utcOffset );
+      
       int utchour = hour;
       if (hour > 12)// reduce from 24h to 12h
         hour -= 12;
@@ -310,7 +325,7 @@ class clockanalog{
       this->display->setRotation(defaultrotation);
      }//end settext
      
-    bool changeUtcOffset(int utcoffset){
+    bool changeUtcOffset(int utcoffset, int utcoffsetmin = 0){
       if((utcoffset < -23) or (utcoffset > 23) )
           return false;
       this->utcOffset = utcoffset;
@@ -323,11 +338,13 @@ class clockanalog{
 #define utcTokyo 9
 #define utcKyiv 2
 #define utcBangkok 7
+#define utcNewDelhi 5
+#define utcNewDelhiMin 30
 
 clockanalog *clk1 = new clockanalog(tft1, utcNewYork , false);
 clockanalog *clk2 = new clockanalog(tft2, utcCopenhagen , false );
 clockanalog *clk3 = new clockanalog(tft3, utcTokyo , false );
-clockanalog *clk4 = new clockanalog(tft4, utcBangkok , false );
+clockanalog *clk4 = new clockanalog(tft4, utcNewDelhi , false ,utcNewDelhiMin);
 
 void setup1(void) {
   
@@ -342,7 +359,7 @@ void setup1(void) {
   clk2->settext("   Esbjerg ");
   clk1->settext("   New York ");
   clk3->settext("Tokyo");
-  clk4->settext("   Bangkok");
+  clk4->settext("  New Delhi");
 }
 
 int last_read_sec = 0;
